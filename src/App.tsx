@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
+import { Web3Provider } from './providers/Web3Provider'
+import { Header } from './components/Header'
+import { NavigationTabs } from './components/NavigationTabs'
 import './App.css'
 
-function App() {
+function AppContent() {
   const [isConnected, setIsConnected] = useState(false)
   const [address, setAddress] = useState('')
 
@@ -27,42 +30,13 @@ function App() {
     }
   }
 
-  const disconnectWallet = () => {
-    setAddress('')
-    setIsConnected(false)
-    toast.success('Wallet disconnected!')
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-      <div className="p-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Etherlink Fusion+</h1>
-        <p className="text-gray-600 mb-8">Cross-chain DeFi Protocol</p>
-        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-          {!isConnected ? (
-            <>
-              <p className="text-sm text-gray-500 mb-4">Connect your wallet to start trading</p>
-              <button 
-                onClick={handleOpenWallet}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-              >
-                Connect Wallet
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-gray-500 mb-4">Wallet Connected!</p>
-              <p className="text-xs text-gray-400 mb-4 break-all">{address}</p>
-              <button 
-                onClick={disconnectWallet}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-              >
-                Disconnect
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      <Header onOpenWallet={handleOpenWallet} />
+      
+      <main className="container mx-auto px-4 py-8">
+        <NavigationTabs />
+      </main>
       
       <Toaster
         position="top-right"
@@ -77,6 +51,14 @@ function App() {
         }}
       />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Web3Provider>
+      <AppContent />
+    </Web3Provider>
   )
 }
 
