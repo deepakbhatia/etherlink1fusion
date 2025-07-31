@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 /**
  * @title IPriceOracle
- * @dev Interface for price oracle adapted for Etherlink
+ *  Interface for price oracle adapted for Etherlink
  */
 interface IPriceOracle {
     struct PriceData {

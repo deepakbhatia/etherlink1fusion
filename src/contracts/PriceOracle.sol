@@ -7,7 +7,7 @@ import "./interfaces/IPriceOracle.sol";
 
 /**
  * @title PriceOracle
- * @dev Price oracle adapted for Etherlink with support for multiple price feeds
+ *  Price oracle adapted for Etherlink with support for multiple price feeds
  * 
  * This contract provides real-time price data for the Etherlink Fusion+ protocol:
  * - Stores and manages token prices with timestamps
@@ -53,7 +53,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Get current price for a token
+     *  Get current price for a token
      */
     function getPrice(address token) 
         external 
@@ -72,7 +72,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Get price with timestamp
+     *  Get price with timestamp
      */
     function getPriceWithTimestamp(address token) 
         external 
@@ -85,7 +85,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Update price for a token
+     *  Update price for a token
      */
     function updatePrice(address token, uint256 price) 
         external 
@@ -105,7 +105,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Batch update prices for multiple tokens
+     *  Batch update prices for multiple tokens
      */
     function updatePrices(
         address[] calldata tokens,
@@ -128,7 +128,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Get exchange rate between two tokens
+     *  Get exchange rate between two tokens
      */
     function getExchangeRate(address tokenA, address tokenB) 
         external 
@@ -152,7 +152,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Check if price is valid (not too old)
+     *  Check if price is valid (not too old)
      */
     function isValidPrice(address token, uint256 maxAge) 
         external 
@@ -166,7 +166,7 @@ contract PriceOracle is IPriceOracle, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Initialize default prices for common tokens (for demo)
+     *  Initialize default prices for common tokens (for demo)
      */
     function _initializeDefaultPrices() internal {
         // ETH price (example: $2000)

@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 /**
  * @title IBridgeAdapter
- * @dev Interface for LayerZero bridge adapter on Etherlink
+ *  Interface for LayerZero bridge adapter on Etherlink
  */
 interface IBridgeAdapter {
     struct BridgeParams {

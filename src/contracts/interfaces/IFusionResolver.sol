@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 /**
  * @title IFusionResolver
- * @dev Interface for 1inch Fusion+ resolver integration on Etherlink
+ *  Interface for 1inch Fusion+ resolver integration on Etherlink
  */
 interface IFusionResolver {
     struct Order {

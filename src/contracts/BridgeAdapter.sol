@@ -9,7 +9,7 @@ import "./interfaces/IBridgeAdapter.sol";
 
 /**
  * @title BridgeAdapter
- * @dev LayerZero bridge adapter for cross-chain token transfers on Etherlink
+ *  LayerZero bridge adapter for cross-chain token transfers on Etherlink
  * 
  * This contract handles cross-chain token bridging operations:
  * - Bridges tokens between Etherlink and other L1/L2 chains
@@ -72,7 +72,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Bridge tokens to destination chain
+     *  Bridge tokens to destination chain
      */
     function bridgeToken(
         BridgeParams calldata params
@@ -109,7 +109,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Simulate bridge operation (in real implementation, this would be LayerZero message handling)
+     *  Simulate bridge operation (in real implementation, this would be LayerZero message handling)
      */
     function _simulateBridge(BridgeParams calldata params) internal {
         // In production, this would:
@@ -122,7 +122,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Estimate bridge fee for a given transfer
+     *  Estimate bridge fee for a given transfer
      */
     function estimateBridgeFee(
         uint16 dstChainId,
@@ -140,7 +140,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Set trusted remote address for a chain
+     *  Set trusted remote address for a chain
      */
     function setTrustedRemote(uint16 chainId, bytes calldata path) 
         external 
@@ -151,7 +151,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Check if remote address is trusted
+     *  Check if remote address is trusted
      */
     function isTrustedRemote(uint16 chainId, bytes calldata path) 
         public 
@@ -163,7 +163,7 @@ contract BridgeAdapter is IBridgeAdapter, Ownable(msg.sender), ReentrancyGuard {
     }
 
     /**
-     * @dev Handle receiving tokens from other chains (LayerZero callback)
+     *  Handle receiving tokens from other chains (LayerZero callback)
      */
     function lzReceive(
         uint16 srcChainId,
