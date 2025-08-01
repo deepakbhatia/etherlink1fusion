@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -318,24 +318,24 @@ contract CrossChainRouter is Ownable(msg.sender), ReentrancyGuard {
         // In a real implementation, this would query a route database
         // For demo purposes, we'll return common route patterns
         
-        bytes32[] memory routes = new bytes32[](4);
+        bytes32[] memory possibleRoutes = new bytes32[](4);
         
         // Route 1: Direct swap
-        routes[0] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, dstToken));
+        possibleRoutes[0] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, dstToken));
         
         // Route 2: Via USDT
         address usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7; // USDT address
-        routes[1] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, usdt, dstToken));
+        possibleRoutes[1] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, usdt, dstToken));
         
         // Route 3: Via DAI
         address dai = 0x6B175474E89094C44Da98b954EedeAC495271d0F; // DAI address
-        routes[2] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, dai, dstToken));
+        possibleRoutes[2] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, dai, dstToken));
         
         // Route 4: Via WETH
         address weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; // WETH address
-        routes[3] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, weth, dstToken));
+        possibleRoutes[3] = keccak256(abi.encodePacked(block.chainid, dstChainId, srcToken, weth, dstToken));
         
-        return routes;
+        return possibleRoutes;
     }
     
     /**

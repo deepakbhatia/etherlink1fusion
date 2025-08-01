@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -42,7 +42,7 @@ contract EtherlinkFusionFactory is Ownable {
         address _bridgeAdapter,
         address _priceOracle,
         address _feeRecipient
-    ) {
+    ) Ownable(msg.sender) {
         implementation = _implementation;
         bridgeAdapter = _bridgeAdapter;
         priceOracle = _priceOracle;
