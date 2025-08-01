@@ -1,6 +1,41 @@
 const { ethers } = require("hardhat");
+const fs = require('fs');
+
+// Get network from command line arguments
+const network = process.argv[2] || 'local';
+
+// Network configurations
+const NETWORKS = {
+  local: {
+    name: 'localhost',
+    chainId: 31337,
+    lzEndpoint: "0x0000000000000000000000000000000000000000", // Mock for local
+    deploymentFile: 'src/contracts/deployments/localhost.json'
+  },
+  testnet: {
+    name: 'etherlinkTestnet',
+    chainId: 128123,
+    lzEndpoint: "0x0000000000000000000000000000000000000000", // Mock for testnet
+    deploymentFile: 'src/contracts/deployments/etherlinkTestnet.json'
+  },
+  mainnet: {
+    name: 'etherlinkMainnet',
+    chainId: 42793,
+    lzEndpoint: "0x0000000000000000000000000000000000000000", // Mock for mainnet
+    deploymentFile: 'src/contracts/deployments/etherlinkMainnet.json'
+  }
+};
 
 async function main() {
+  const config = NETWORKS[network];
+  if (!config) {
+    console.error(`❌ Invalid network: ${network}`);
+    console.log("Available networks: local, testnet, mainnet");
+    process.exit(1);
+  }
+
+  console.log(`🚀 Deploying to ${config.name} (Chain ID: ${config.chainId})`);
+  
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with account:", deployer.address);
   console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
@@ -15,8 +50,7 @@ async function main() {
   // Step 2: Deploy BridgeAdapter
   console.log("\n2. Deploying BridgeAdapter...");
   const BridgeAdapter = await ethers.getContractFactory("BridgeAdapter");
-  const lzEndpoint = "0x0000000000000000000000000000000000000000"; // Mock LayerZero endpoint
-  const bridgeAdapter = await BridgeAdapter.deploy(lzEndpoint);
+  const bridgeAdapter = await BridgeAdapter.deploy(config.lzEndpoint);
   await bridgeAdapter.waitForDeployment();
   console.log("BridgeAdapter deployed to:", await bridgeAdapter.getAddress());
 
@@ -89,8 +123,8 @@ async function main() {
 
   // Step 9: Save deployment addresses
   const deploymentInfo = {
-    network: "etherlinkTestnet",
-    chainId: 128123,
+    network: config.name,
+    chainId: config.chainId,
     deployer: deployer.address,
     timestamp: new Date().toISOString(),
     contracts: {
@@ -105,13 +139,15 @@ async function main() {
   console.log("\n=== DEPLOYMENT COMPLETE ===");
   console.log("Deployment Info:", JSON.stringify(deploymentInfo, null, 2));
   
+  // Create deployments directory if it doesn't exist
+  const deploymentsDir = 'src/contracts/deployments';
+  if (!fs.existsSync(deploymentsDir)) {
+    fs.mkdirSync(deploymentsDir, { recursive: true });
+  }
+  
   // Save to file
-  const fs = require('fs');
-  fs.writeFileSync(
-    'src/contracts/deployments/etherlinkTestnet.json',
-    JSON.stringify(deploymentInfo, null, 2)
-  );
-  console.log("Deployment info saved to src/contracts/deployments/etherlinkTestnet.json");
+  fs.writeFileSync(config.deploymentFile, JSON.stringify(deploymentInfo, null, 2));
+  console.log(`Deployment info saved to ${config.deploymentFile}`);
 
   console.log("\n=== CONTRACT ADDRESSES ===");
   console.log("PriceOracle:", await priceOracle.getAddress());
@@ -119,6 +155,8 @@ async function main() {
   console.log("EtherlinkFusionResolverImpl:", await fusionResolverImpl.getAddress());
   console.log("EtherlinkFusionFactory:", await fusionFactory.getAddress());
   console.log("CrossChainRouter:", await crossChainRouter.getAddress());
+  
+  console.log(`\n✅ Successfully deployed to ${config.name}!`);
 }
 
 main()
