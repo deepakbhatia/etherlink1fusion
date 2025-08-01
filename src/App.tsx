@@ -13,7 +13,7 @@ function AppContent() {
     // Check if MetaMask is installed
     if (typeof window.ethereum !== 'undefined') {
       // Request account access
-      window.ethereum.request({ method: 'eth_requestAccounts' })
+      (window.ethereum as any).request({ method: 'eth_requestAccounts' })
         .then((accounts: string[]) => {
           if (accounts.length > 0) {
             setAddress(accounts[0])
