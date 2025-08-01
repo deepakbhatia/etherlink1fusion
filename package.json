@@ -1,13 +1,20 @@
 {
-  "name": "react_repo",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "etherlink-fusion-dapp",
+  "version": "1.0.0",
+  "description": "Etherlink Fusion+ Cross-Chain DeFi Protocol",
+  "main": "index.js",
   "scripts": {
     "dev": "yes | pnpm install && vite",
     "build": "yes | pnpm install && rm -rf node_modules/.vite-temp && tsc -b && vite build",
     "lint": "yes | pnpm install && eslint .",
-    "preview": "yes | pnpm install && vite preview"
+    "preview": "yes | pnpm install && vite preview",
+    "compile": "hardhat compile",
+    "copy-abis": "node scripts/copy-abis.js",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network etherlinkTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network etherlinkMainnet",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "test": "hardhat test",
+    "node": "hardhat node"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -84,6 +91,20 @@
     "tailwindcss": "v3.4.16",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.15.0",
-    "vite": "^6.0.1"
-  }
+    "vite": "^6.0.1",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [
+    "etherlink",
+    "defi",
+    "cross-chain",
+    "1inch",
+    "fusion",
+    "bridge",
+    "swap"
+  ],
+  "author": "Etherlink Fusion+ Team",
+  "license": "MIT"
 }
