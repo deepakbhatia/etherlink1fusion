@@ -3,52 +3,52 @@ const { ethers } = require("hardhat");
 async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with account:", deployer.address);
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
 
   // Step 1: Deploy PriceOracle
   console.log("\n1. Deploying PriceOracle...");
   const PriceOracle = await ethers.getContractFactory("PriceOracle");
   const priceOracle = await PriceOracle.deploy();
-  await priceOracle.deployed();
-  console.log("PriceOracle deployed to:", priceOracle.address);
+  await priceOracle.waitForDeployment();
+  console.log("PriceOracle deployed to:", await priceOracle.getAddress());
 
   // Step 2: Deploy BridgeAdapter
   console.log("\n2. Deploying BridgeAdapter...");
   const BridgeAdapter = await ethers.getContractFactory("BridgeAdapter");
   const lzEndpoint = "0x0000000000000000000000000000000000000000"; // Mock LayerZero endpoint
   const bridgeAdapter = await BridgeAdapter.deploy(lzEndpoint);
-  await bridgeAdapter.deployed();
-  console.log("BridgeAdapter deployed to:", bridgeAdapter.address);
+  await bridgeAdapter.waitForDeployment();
+  console.log("BridgeAdapter deployed to:", await bridgeAdapter.getAddress());
 
   // Step 3: Deploy EtherlinkFusionResolver Implementation
   console.log("\n3. Deploying EtherlinkFusionResolver Implementation...");
   const EtherlinkFusionResolver = await ethers.getContractFactory("EtherlinkFusionResolver");
   const fusionResolverImpl = await EtherlinkFusionResolver.deploy();
-  await fusionResolverImpl.deployed();
-  console.log("EtherlinkFusionResolver Implementation deployed to:", fusionResolverImpl.address);
+  await fusionResolverImpl.waitForDeployment();
+  console.log("EtherlinkFusionResolver Implementation deployed to:", await fusionResolverImpl.getAddress());
 
   // Step 4: Deploy EtherlinkFusionFactory
   console.log("\n4. Deploying EtherlinkFusionFactory...");
   const EtherlinkFusionFactory = await ethers.getContractFactory("EtherlinkFusionFactory");
   const fusionFactory = await EtherlinkFusionFactory.deploy(
-    fusionResolverImpl.address,  // Implementation
-    bridgeAdapter.address,       // BridgeAdapter
-    priceOracle.address,         // PriceOracle
-    deployer.address             // Fee recipient
+    await fusionResolverImpl.getAddress(),  // Implementation
+    await bridgeAdapter.getAddress(),       // BridgeAdapter
+    await priceOracle.getAddress(),         // PriceOracle
+    deployer.address                        // Fee recipient
   );
-  await fusionFactory.deployed();
-  console.log("EtherlinkFusionFactory deployed to:", fusionFactory.address);
+  await fusionFactory.waitForDeployment();
+  console.log("EtherlinkFusionFactory deployed to:", await fusionFactory.getAddress());
 
   // Step 5: Deploy CrossChainRouter
   console.log("\n5. Deploying CrossChainRouter...");
   const CrossChainRouter = await ethers.getContractFactory("CrossChainRouter");
   const crossChainRouter = await CrossChainRouter.deploy(
-    fusionResolverImpl.address,  // FusionResolver
-    bridgeAdapter.address,       // BridgeAdapter
-    priceOracle.address          // PriceOracle
+    await fusionResolverImpl.getAddress(),  // FusionResolver
+    await bridgeAdapter.getAddress(),       // BridgeAdapter
+    await priceOracle.getAddress()          // PriceOracle
   );
-  await crossChainRouter.deployed();
-  console.log("CrossChainRouter deployed to:", crossChainRouter.address);
+  await crossChainRouter.waitForDeployment();
+  console.log("CrossChainRouter deployed to:", await crossChainRouter.getAddress());
 
   // Step 6: Initialize BridgeAdapter with supported chains
   console.log("\n6. Configuring BridgeAdapter...");
@@ -70,8 +70,8 @@ async function main() {
   console.log("\n8. Setting up route configurations...");
   
   // Example route: USDC on Ethereum to USDC on Etherlink
-  const routeId = ethers.utils.keccak256(
-    ethers.utils.defaultAbiCoder.encode(
+  const routeId = ethers.keccak256(
+    ethers.AbiCoder.defaultAbiCoder().encode(
       ["uint256", "uint16", "address", "address"],
       [1, 42793, "0xA0b86a33E6411b4B4F2a88F2Dd62f0C9C93a3a36", "0x796Ea11Fa2dD751eD01b53C372fFDB4AAa8f00F9"]
     )
@@ -95,11 +95,11 @@ async function main() {
     deployer: deployer.address,
     timestamp: new Date().toISOString(),
     contracts: {
-      PriceOracle: priceOracle.address,
-      BridgeAdapter: bridgeAdapter.address,
-      EtherlinkFusionResolverImpl: fusionResolverImpl.address,
-      EtherlinkFusionFactory: fusionFactory.address,
-      CrossChainRouter: crossChainRouter.address
+      PriceOracle: await priceOracle.getAddress(),
+      BridgeAdapter: await bridgeAdapter.getAddress(),
+      EtherlinkFusionResolverImpl: await fusionResolverImpl.getAddress(),
+      EtherlinkFusionFactory: await fusionFactory.getAddress(),
+      CrossChainRouter: await crossChainRouter.getAddress()
     }
   };
 
@@ -115,11 +115,11 @@ async function main() {
   console.log("Deployment info saved to src/contracts/deployments/etherlinkTestnet.json");
 
   console.log("\n=== CONTRACT ADDRESSES ===");
-  console.log("PriceOracle:", priceOracle.address);
-  console.log("BridgeAdapter:", bridgeAdapter.address);
-  console.log("EtherlinkFusionResolverImpl:", fusionResolverImpl.address);
-  console.log("EtherlinkFusionFactory:", fusionFactory.address);
-  console.log("CrossChainRouter:", crossChainRouter.address);
+  console.log("PriceOracle:", await priceOracle.getAddress());
+  console.log("BridgeAdapter:", await bridgeAdapter.getAddress());
+  console.log("EtherlinkFusionResolverImpl:", await fusionResolverImpl.getAddress());
+  console.log("EtherlinkFusionFactory:", await fusionFactory.getAddress());
+  console.log("CrossChainRouter:", await crossChainRouter.getAddress());
 }
 
 main()
