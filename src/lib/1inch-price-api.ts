@@ -116,16 +116,13 @@ export class OneInchPriceAPI {
     chainId: number
     tokenAddress: string
   }) {
-    const [metadata, prices] = await Promise.all([
-      this.getTokenMetadata(params),
-      this.getTokenPrices({
-        chainId: params.chainId,
-        tokens: [params.tokenAddress]
-      })
-    ])
+    const prices = await this.getTokenPrices({
+      chainId: params.chainId,
+      tokens: [params.tokenAddress]
+    })
 
     return {
-      ...metadata,
+      symbol: this.getTokenSymbolFromAddress(params.tokenAddress, params.chainId),
       price: prices[params.tokenAddress]?.price || 0,
       priceChange24h: prices[params.tokenAddress]?.priceChange24h || 0
     }
@@ -213,16 +210,13 @@ export class OneInchPriceAPI {
     const symbols: { [address: string]: string } = {}
     
     try {
-      // Try to get metadata for each token
+      // Get symbols for each token using address mapping
       const promises = params.addresses.map(async (address) => {
         try {
-          const metadata = await this.getTokenMetadata({
-            chainId: params.chainId,
-            tokenAddress: address
-          })
-          return { address, symbol: metadata.symbol || 'Unknown' }
+          const symbol = this.getTokenSymbolFromAddress(address, params.chainId)
+          return { address, symbol }
         } catch (error) {
-          console.warn(`Failed to get metadata for ${address}:`, error)
+          console.warn(`Failed to get symbol for ${address}:`, error)
           return { address, symbol: 'Unknown' }
         }
       })
