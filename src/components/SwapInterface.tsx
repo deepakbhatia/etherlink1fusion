@@ -38,6 +38,30 @@ export function SwapInterface() {
     return 1.5
   }, [exchangeRate, fromAmount])
 
+  // Determine price source for display
+  const getPriceSource = () => {
+    if (!fromToken || !toToken) return null
+    
+    // Check if we're on Etherlink mainnet (cross-chain prices)
+    const { isEtherlinkMainnet } = useTokens()
+    
+    if (isEtherlinkMainnet) {
+      return { source: 'Cross-Chain Bridge', color: 'text-purple-600', icon: '🌉' }
+    }
+    
+    // Check if prices are from 1inch API (real prices)
+    const isFromAPI = fromToken.price !== 1.00 && fromToken.price !== 3500.00 && 
+                     fromToken.price !== 45000.00 && fromToken.price !== 1.20
+    
+    if (isFromAPI) {
+      return { source: '1inch API', color: 'text-green-600', icon: '🌐' }
+    } else {
+      return { source: 'PriceOracle Contract', color: 'text-blue-600', icon: '📋' }
+    }
+  }
+
+  const priceSource = getPriceSource()
+
   const handleSwapTokens = () => {
     const temp = fromToken
     setFromToken(toToken)
@@ -94,6 +118,12 @@ export function SwapInterface() {
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Token Swap</CardTitle>
           <div className="flex items-center space-x-2">
+            {priceSource && (
+              <div className={`text-xs ${priceSource.color} flex items-center space-x-1`}>
+                <span>{priceSource.icon}</span>
+                <span>{priceSource.source}</span>
+              </div>
+            )}
             <Button variant="ghost" size="sm">
               <Settings className="h-4 w-4" />
             </Button>
@@ -144,7 +174,7 @@ export function SwapInterface() {
               />
               {fromToken && (
                 <span className="text-xs text-gray-500">
-                  Balance: {fromToken.balance} {fromToken.symbol}
+                  Balance: -- {fromToken.symbol}
                 </span>
               )}
             </div>
@@ -187,7 +217,7 @@ export function SwapInterface() {
               />
               {toToken && (
                 <span className="text-xs text-gray-500">
-                  Balance: {toToken.balance} {toToken.symbol}
+                  Balance: -- {toToken.symbol}
                 </span>
               )}
             </div>
