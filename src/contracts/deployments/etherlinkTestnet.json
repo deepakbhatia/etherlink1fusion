@@ -1,13 +1,13 @@
 {
   "network": "etherlinkTestnet",
   "chainId": 128123,
-  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "timestamp": "2025-08-01T07:50:36.187Z",
+  "deployer": "0x9aAEDb776b73D8E763Db744BE94c69529D9f0e44",
+  "timestamp": "2025-08-03T12:12:18.817Z",
   "contracts": {
-    "PriceOracle": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-    "BridgeAdapter": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-    "EtherlinkFusionResolverImpl": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-    "EtherlinkFusionFactory": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-    "CrossChainRouter": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+    "PriceOracle": "0xaFf493AaA8989509dC82b11315d7E2d08b1B4F9F",
+    "BridgeAdapter": "0xfcd72FD2C49a91a6aC94935a221E23E246DE2723",
+    "EtherlinkFusionResolverImpl": "0x0e48a6439Ed91398DeEF51171CA505B5950F89F4",
+    "EtherlinkFusionFactory": "0x3A6d7F2911776A985B0A09e33e8FB6dd93d74430",
+    "CrossChainRouter": "0x3115Ff33a21a5F99f8eeAC6E52e2d3e3Bc49dC87"
   }
 }
