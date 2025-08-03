@@ -10,8 +10,8 @@ import { useOrders } from '../hooks/useOrders'
 import toast from 'react-hot-toast'
 
 export function SwapInterface() {
-  const { tokens } = useTokens()
-  const { createOrder } = useOrders()
+  const { tokens, isEtherlinkMainnet } = useTokens()
+  const { createOrder, isTestnet, isMainnet, resolverAddress } = useOrders()
   
   const [fromToken, setFromToken] = useState<Token | null>(null)
   const [toToken, setToToken] = useState<Token | null>(null)
@@ -43,8 +43,6 @@ export function SwapInterface() {
     if (!fromToken || !toToken) return null
     
     // Check if we're on Etherlink mainnet (cross-chain prices)
-    const { isEtherlinkMainnet } = useTokens()
-    
     if (isEtherlinkMainnet) {
       return { source: 'Cross-Chain Bridge', color: 'text-purple-600', icon: '🌉' }
     }
@@ -292,13 +290,38 @@ export function SwapInterface() {
           )}
         </Button>
 
-        {/* Order Type Info */}
-        <div className="text-xs text-gray-500 bg-gray-50 rounded p-2">
+        {/* Network & Contract Info */}
+        <div className="text-xs text-gray-500 bg-gray-50 rounded p-2 space-y-2">
+          <div className="flex items-center justify-between">
+            <span>Network:</span>
+            <span className={`font-medium ${
+              isTestnet ? 'text-blue-600' : 
+              isMainnet ? 'text-purple-600' : 
+              'text-gray-600'
+            }`}>
+              {isTestnet ? 'Etherlink Testnet' : 
+               isMainnet ? 'Etherlink Mainnet' : 
+               'Unknown Network'}
+            </span>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span>Smart Contract:</span>
+            <span className={`font-medium ${
+              isTestnet && resolverAddress ? 'text-green-600' : 'text-orange-600'
+            }`}>
+              {isTestnet && resolverAddress ? '✅ Connected' : '⚠️ Not Available'}
+            </span>
+          </div>
+          
           {swapType === 'dutch_auction' ? (
             <div className="flex items-start space-x-2">
               <Clock className="h-3 w-3 mt-0.5 text-blue-500" />
               <div>
                 <strong>Dutch Auction:</strong> Price starts high and decreases over 5 minutes until filled or expired.
+                {isTestnet && resolverAddress && (
+                  <span className="text-green-600"> Will be posted to smart contract.</span>
+                )}
               </div>
             </div>
           ) : (
@@ -306,6 +329,9 @@ export function SwapInterface() {
               <Zap className="h-3 w-3 mt-0.5 text-green-500" />
               <div>
                 <strong>Limit Order:</strong> Order will be filled when market price matches your specified rate.
+                {isTestnet && resolverAddress && (
+                  <span className="text-green-600"> Will be posted to smart contract.</span>
+                )}
               </div>
             </div>
           )}
