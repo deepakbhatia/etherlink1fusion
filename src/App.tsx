@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import { Web3Provider } from './providers/Web3Provider'
+import { OrdersProvider } from './contexts/OrdersContext'
 import { Header } from './components/Header'
 import { NavigationTabs } from './components/NavigationTabs'
 import './App.css'
@@ -57,7 +58,9 @@ function AppContent() {
 function App() {
   return (
     <Web3Provider>
-      <AppContent />
+      <OrdersProvider>
+        <AppContent />
+      </OrdersProvider>
     </Web3Provider>
   )
 }

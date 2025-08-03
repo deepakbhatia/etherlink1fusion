@@ -53,7 +53,7 @@ export const tokenAddresses = {
   },
   [etherlinkTestnet.id]: {
     USDC: '0x796Ea11Fa2dD751eD01b53C372fFDB4AAa8f00F9',
-    USDT: '0x2C03058C8AFC06713be23e58D2febC8337dbfE6A',
+    USDT: '0xb8fB2E8738e60d9CDb53117aC5ac3B6d3313D4c2', // Deployed Mock USDT
     WETH: '0xfc24f770F94edBca6D6f885E12d4317320BcB401',
     WBTC: '0xbFc94CD2B1E55999Cfc7347a9313e88702B83d0F',
   },
@@ -80,10 +80,10 @@ export const tokenAddresses = {
 // Contract addresses
 export const contractAddresses = {
   [etherlinkTestnet.id]: {
-    PriceOracle: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
-    BridgeAdapter: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
-    EtherlinkFusionResolver: '0xc5a5C42992dECbae36851359345FE25997F5C42d',
-    EtherlinkFusionFactory: '0x67d269191c92Caf3cD7723F116c85e6E9bf55933',
-    CrossChainRouter: '0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E',
+    PriceOracle: '0xaFf493AaA8989509dC82b11315d7E2d08b1B4F9F',
+    BridgeAdapter: '0xfcd72FD2C49a91a6aC94935a221E23E246DE2723',
+    EtherlinkFusionResolver: '0x0e48a6439Ed91398DeEF51171CA505B5950F89F4',
+    EtherlinkFusionFactory: '0x3A6d7F2911776A985B0A09e33e8FB6dd93d74430',
+    CrossChainRouter: '0x3115Ff33a21a5F99f8eeAC6E52e2d3e3Bc49dC87',
   },
 } as const 

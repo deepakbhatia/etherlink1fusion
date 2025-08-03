@@ -6,7 +6,7 @@ import { TokenSelector } from './TokenSelector'
 import { DutchAuctionTimer } from './DutchAuctionTimer'
 import { PriceImpactIndicator } from './PriceImpactIndicator'
 import { useTokens, Token } from '../hooks/useTokens'
-import { useOrders } from '../hooks/useOrders'
+import { useOrders } from '../contexts/OrdersContext'
 import toast from 'react-hot-toast'
 
 export function SwapInterface() {
@@ -95,7 +95,9 @@ export function SwapInterface() {
         currentPrice: toAmount
       }
 
-      await createOrder(orderData)
+      console.log('🚀 Creating order with data:', orderData)
+      const result = await createOrder(orderData)
+      console.log('✅ Order creation result:', result)
       toast.success(`${swapType === 'dutch_auction' ? 'Dutch auction' : 'Limit'} order created successfully!`)
       
       // Reset form
@@ -314,27 +316,27 @@ export function SwapInterface() {
             </span>
           </div>
           
-          {swapType === 'dutch_auction' ? (
-            <div className="flex items-start space-x-2">
-              <Clock className="h-3 w-3 mt-0.5 text-blue-500" />
-              <div>
-                <strong>Dutch Auction:</strong> Price starts high and decreases over 5 minutes until filled or expired.
-                {isTestnet && resolverAddress && (
-                  <span className="text-green-600"> Will be posted to smart contract.</span>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start space-x-2">
-              <Zap className="h-3 w-3 mt-0.5 text-green-500" />
-              <div>
-                <strong>Limit Order:</strong> Order will be filled when market price matches your specified rate.
-                {isTestnet && resolverAddress && (
-                  <span className="text-green-600"> Will be posted to smart contract.</span>
-                )}
-              </div>
-            </div>
-          )}
+                              {swapType === 'dutch_auction' ? (
+                      <div className="flex items-start space-x-2">
+                        <Clock className="h-3 w-3 mt-0.5 text-blue-500" />
+                        <div>
+                          <strong>Dutch Auction:</strong> Price starts high and decreases over 5 minutes until filled or expired.
+                          {isTestnet && resolverAddress && (
+                            <span className="text-green-600"> ✅ Real blockchain transaction on testnet</span>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start space-x-2">
+                        <Zap className="h-3 w-3 mt-0.5 text-green-500" />
+                        <div>
+                          <strong>Limit Order:</strong> Order will be filled when market price matches your specified rate.
+                          {isTestnet && resolverAddress && (
+                            <span className="text-green-600"> ✅ Real blockchain transaction on testnet</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
         </div>
       </CardContent>
     </Card>

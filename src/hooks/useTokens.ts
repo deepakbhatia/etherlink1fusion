@@ -52,20 +52,42 @@ const mockTokens: Token[] = [
   },
 ]
 
+// Etherlink testnet tokens (using deployed mock tokens)
+const etherlinkTestnetTokens: Token[] = [
+  {
+    symbol: 'USDT',
+    name: 'Mock USDT',
+    address: '0xb8fB2E8738e60d9CDb53117aC5ac3B6d3313D4c2', // Deployed Mock USDT
+    decimals: 6,
+    price: 1.00,
+  },
+  {
+    symbol: 'XTZ',
+    name: 'Tezos',
+    address: '0x0000000000000000000000000000000000000000',
+    decimals: 18,
+    price: 1.20,
+  },
+]
+
 export function useTokens() {
   const { chainId } = useAccount()
   const [tokens, setTokens] = useState<Token[]>(mockTokens)
   const [loading, setLoading] = useState(false)
 
-  // Check if we're on Etherlink mainnet
+  // Check if we're on Etherlink testnet or mainnet
+  const isEtherlinkTestnet = chainId === 128123
   const isEtherlinkMainnet = chainId === 42793
+  
+  // Use appropriate token list based on network
+  const baseTokens = isEtherlinkTestnet ? etherlinkTestnetTokens : mockTokens
 
   // Get cross-chain prices for Etherlink mainnet
   const { prices: crossChainPrices, loading: crossChainLoading, isEtherlinkMainnet: isMainnet } = useCrossChainPrices()
 
   // Get real prices from 1inch API (for other chains)
   const chainIdForAPI = SUPPORTED_CHAINS.ethereum // Use Ethereum mainnet for 1inch API
-  const tokenAddresses = mockTokens.map(t => t.address)
+  const tokenAddresses = baseTokens.map(t => t.address)
   const { prices: apiPrices, loading: apiLoading } = usePrices(chainIdForAPI, tokenAddresses)
 
   // Get backup prices from PriceOracle contract
@@ -74,7 +96,7 @@ export function useTokens() {
   useEffect(() => {
     setLoading(true)
     
-    const updatedTokens = mockTokens.map(token => {
+    const updatedTokens = baseTokens.map(token => {
       // On Etherlink mainnet - use cross-chain prices
       if (isEtherlinkMainnet) {
         const crossChainPrice = crossChainPrices[token.address]
