@@ -91,7 +91,8 @@ export function useAnalytics() {
 
       // Generate  volume data based on real prices
       const volumeData = generateVolumeData(baseVolume)
-
+      const tokenData = generateTokenData(realPrices)
+      const recentTrades = generateRecentTrades()
 
       // Check contract status
       const contractStatus = {
@@ -107,8 +108,8 @@ export function useAnalytics() {
         totalUsers,
         avgFillTime: 2.3,
         volumeData,
-        tokenData: [],
-        recentTrades: [],
+        tokenData,
+        recentTrades,
         contractStatus,
         realPrices
       })
