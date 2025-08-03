@@ -25,7 +25,7 @@ export interface AnalyticsData {
   realPrices: any
 }
 
-export function useAnalytics() {
+export function useAnalytics(selectedNetwork: string = 'etherlinkTestnet') {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     totalVolume: 0,
     activeOrders: 0,
@@ -45,8 +45,8 @@ export function useAnalytics() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Contract addresses
-  const chainId = 128123 // Etherlink testnet
+  // Get chain ID based on selected network
+  const chainId = SUPPORTED_CHAINS[selectedNetwork as keyof typeof SUPPORTED_CHAINS] || SUPPORTED_CHAINS.etherlinkTestnet
   const contracts = contractAddresses[chainId] || {}
   const priceOracleAddress = (contracts as any).PriceOracle as `0x${string}` | undefined
   const factoryAddress = (contracts as any).EtherlinkFusionFactory as `0x${string}` | undefined
@@ -70,10 +70,10 @@ export function useAnalytics() {
     setError(null)
 
     try {
-      // Get real prices from 1inch API
+      // Get real prices from 1inch API for selected network
       const realPrices = await oneInchPriceAPI.getTokenPrices({
-        chainId: SUPPORTED_CHAINS.etherlinkTestnet,
-        tokens: Object.values(COMMON_TOKENS[SUPPORTED_CHAINS.etherlinkTestnet] || {})
+        chainId: chainId,
+        tokens: Object.values(COMMON_TOKENS[chainId] || {})
       })
 
       // Calculate total volume from real prices
@@ -181,7 +181,6 @@ export function useAnalytics() {
 
   // Helper function to get token symbol from address
   const getTokenSymbol = (address: string): string => {
-    const chainId = SUPPORTED_CHAINS.etherlinkTestnet
     const commonTokens = COMMON_TOKENS[chainId] || {}
     
     // Find token symbol by address
@@ -231,7 +230,7 @@ export function useAnalytics() {
     const interval = setInterval(fetchAnalyticsData, 30000) // Update every 30 seconds
 
     return () => clearInterval(interval)
-  }, [priceOracleData, factoryData])
+  }, [priceOracleData, factoryData, selectedNetwork])
 
   return {
     analyticsData,

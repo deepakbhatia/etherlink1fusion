@@ -1,24 +1,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { TrendingUp, TrendingDown, DollarSign, Activity, Users, Zap } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, Activity, Users, Zap, Globe, Settings } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 import { useAccount, useBalance } from 'wagmi'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { usePrices } from '../hooks/usePrices'
 import { SUPPORTED_CHAINS, COMMON_TOKENS } from '../lib/1inch-price-api'
+import { useState } from 'react'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
 
 export function AnalyticsDashboard() {
   const { address, isConnected } = useAccount()
-  const { analyticsData, loading, error } = useAnalytics()
+  const [selectedNetwork, setSelectedNetwork] = useState('etherlinkTestnet')
+  const { analyticsData, loading, error } = useAnalytics(selectedNetwork)
 
   // Fetch user balance
   const { data: userBalance } = useBalance({
     address: address
   })
 
-  // Get real prices for common tokens
-  const chainId = SUPPORTED_CHAINS.etherlinkTestnet
+  // Get real prices for common tokens based on selected network
+  const chainId = SUPPORTED_CHAINS[selectedNetwork as keyof typeof SUPPORTED_CHAINS] || SUPPORTED_CHAINS.etherlinkTestnet
   const commonTokenAddresses = Object.values(COMMON_TOKENS[chainId] || {})
   const { prices, loading: pricesLoading } = usePrices(chainId, commonTokenAddresses)
+
+  // Network options for the switch
+  const networkOptions = [
+    { id: 'ethereum', name: 'Ethereum Mainnet', chainId: SUPPORTED_CHAINS.ethereum, color: 'bg-blue-500' },
+    { id: 'arbitrum', name: 'Arbitrum', chainId: SUPPORTED_CHAINS.arbitrum, color: 'bg-blue-600' },
+    { id: 'optimism', name: 'Optimism', chainId: SUPPORTED_CHAINS.optimism, color: 'bg-red-500' },
+    { id: 'base', name: 'Base', chainId: SUPPORTED_CHAINS.base, color: 'bg-blue-700' },
+    { id: 'etherlinkTestnet', name: 'Etherlink Testnet', chainId: SUPPORTED_CHAINS.etherlinkTestnet, color: 'bg-purple-500' },
+    { id: 'etherlink', name: 'Etherlink Mainnet', chainId: SUPPORTED_CHAINS.etherlink, color: 'bg-purple-600' }
+  ]
+
+  const getNetworkName = (networkId: string) => {
+    const network = networkOptions.find(n => n.id === networkId)
+    return network?.name || 'Unknown Network'
+  }
+
+  const getNetworkColor = (networkId: string) => {
+    const network = networkOptions.find(n => n.id === networkId)
+    return network?.color || 'bg-gray-500'
+  }
 
   const protocolStats = [
     {
@@ -116,7 +140,7 @@ export function AnalyticsDashboard() {
       if (priceData && priceData.volume24h) {
         const volumePercent = (priceData.volume24h / totalVolume) * 100
         const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444']
-        const tokenSymbol = getTokenSymbol(address)
+        const tokenSymbol = getTokenSymbol(address, selectedNetwork)
         
         console.log(`Token ${index + 1}: Address=${address}, Symbol=${tokenSymbol}, Volume=${priceData.volume24h}`)
         
@@ -175,6 +199,55 @@ export function AnalyticsDashboard() {
         </p>
       </div>
 
+      {/* Network Switch */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Globe className="h-5 w-5" />
+            <span>Network Selection</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className={`flex items-center space-x-1 ${getNetworkColor(selectedNetwork)}`}>
+                <Globe className="h-4 w-4" />
+                <span>{getNetworkName(selectedNetwork)}</span>
+              </Badge>
+              <span className="text-sm text-gray-600">
+                Chain ID: {SUPPORTED_CHAINS[selectedNetwork as keyof typeof SUPPORTED_CHAINS]}
+              </span>
+            </div>
+            <div className="text-sm text-gray-600">
+              {Object.keys(prices).length} tokens tracked
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            {networkOptions.map((network) => (
+              <Button
+                key={network.id}
+                variant={selectedNetwork === network.id ? "default" : "outline"}
+                size="sm"
+                className="text-xs"
+                onClick={() => setSelectedNetwork(network.id)}
+              >
+                {network.name}
+              </Button>
+            ))}
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <div className="text-sm text-blue-800">
+              <strong>Network Switch Demo:</strong> Switch between networks to see how 1inch API provides real-time price data across different chains. 
+              {selectedNetwork === 'ethereum' || selectedNetwork === 'arbitrum' || selectedNetwork === 'optimism' || selectedNetwork === 'base' 
+                ? ' ✅ Real 1inch API data available' 
+                : ' ⚠️ Using mock data (1inch API not supported)'}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {protocolStats.map((stat, index) => (
@@ -195,7 +268,7 @@ export function AnalyticsDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {Object.entries(prices).slice(0, 4).map(([address, priceData]) => {
                 // Get token symbol from address
-                const tokenSymbol = getTokenSymbol(address)
+                const tokenSymbol = getTokenSymbol(address, selectedNetwork)
                 
                 return (
                   <div key={address} className="text-center p-4 bg-gray-50 rounded-lg">
@@ -309,8 +382,8 @@ export function AnalyticsDashboard() {
 }
 
 // Helper function to get token symbol from address
-function getTokenSymbol(address: string): string {
-  const chainId = SUPPORTED_CHAINS.etherlinkTestnet
+function getTokenSymbol(address: string, selectedNetwork: string): string {
+  const chainId = SUPPORTED_CHAINS[selectedNetwork as keyof typeof SUPPORTED_CHAINS] || SUPPORTED_CHAINS.etherlinkTestnet
   const commonTokens = COMMON_TOKENS[chainId] || {}
   
   // Find token symbol by address
