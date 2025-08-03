@@ -1,8 +1,8 @@
 const { ethers } = require("hardhat");
 const fs = require('fs');
 
-// Get network from command line arguments
-const network = process.argv[2] || 'local';
+// Get network from environment variable or command line arguments
+const network = process.env.NETWORK || process.argv[2] || 'local';
 
 // Network configurations
 const NETWORKS = {
