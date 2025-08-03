@@ -60,9 +60,96 @@ export function useCrossChainPrices() {
 
     // On Etherlink mainnet - fetch cross-chain prices
     setLoading(true)
-   
+    fetchCrossChainPrices()
   }, [isEtherlinkMainnet])
 
+  const fetchCrossChainPrices = async () => {
+    try {
+      const crossChainPrices: Record<string, CrossChainPrice> = {}
+
+      for (const tokenMapping of ETHERLINK_TOKEN_MAPPINGS) {
+        try {
+          // Step 1: Get mainnet price from 1inch API
+          const mainnetPrice = await fetch1inchPrice(tokenMapping.mainnetAddress)
+          
+          // Step 2: Get bridge exchange rate (simulated for demo)
+          const bridgeRate = await getBridgeRate(tokenMapping.mainnetAddress, tokenMapping.etherlinkAddress)
+          
+          // Step 3: Calculate Etherlink price
+          const etherlinkPrice = mainnetPrice * bridgeRate
+
+          crossChainPrices[tokenMapping.etherlinkAddress] = {
+            etherlinkPrice,
+            mainnetPrice,
+            bridgeRate,
+            source: 'cross-chain'
+          }
+
+          console.log(`✅ Cross-chain price for ${tokenMapping.symbol}:`, {
+            mainnetPrice: `$${mainnetPrice}`,
+            bridgeRate: bridgeRate.toFixed(4),
+            etherlinkPrice: `$${etherlinkPrice}`
+          })
+
+        } catch (error) {
+          console.error(`❌ Failed to fetch cross-chain price for ${tokenMapping.symbol}:`, error)
+          
+          // Fallback to mock price
+          crossChainPrices[tokenMapping.etherlinkAddress] = {
+            etherlinkPrice: 1.00,
+            mainnetPrice: 1.00,
+            bridgeRate: 1.00,
+            source: 'mock'
+          }
+        }
+      }
+
+      setPrices(crossChainPrices)
+    } catch (error) {
+      console.error('❌ Failed to fetch cross-chain prices:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch mainnet price from 1inch API
+  const fetch1inchPrice = async (mainnetTokenAddress: string): Promise<number> => {
+    const API_KEY = import.meta.env.VITE_1INCH_DATA_API_KEY || 'demo-key'
+    const url = `https://api.1inch.dev/price/v1.1/1?tokens=${mainnetTokenAddress}`
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`1inch API failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const tokenData = data[mainnetTokenAddress.toLowerCase()]
+    
+    if (!tokenData || !tokenData.price) {
+      throw new Error('No price data from 1inch API')
+    }
+
+    return tokenData.price
+  }
+
+  // Get bridge exchange rate (simulated for demo)
+  const getBridgeRate = async (mainnetToken: string, etherlinkToken: string): Promise<number> => {
+    // In a real implementation, this would query the bridge contract
+    // For demo purposes, we'll simulate a realistic exchange rate
+    
+    // Simulate slight price differences due to bridge liquidity
+    const baseRate = 1.0
+    const variation = 0.001 // 0.1% variation
+    const randomVariation = (Math.random() - 0.5) * variation
+    
+    return baseRate + randomVariation
+  }
 
   const getPrice = (tokenAddress: string): CrossChainPrice | null => {
     return prices[tokenAddress] || null
