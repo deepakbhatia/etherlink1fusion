@@ -109,18 +109,28 @@ export function AnalyticsDashboard() {
     )
   }
 
-  // Generate real price data for charts
-  const generateVolumeData = () => {
-    const baseVolume = analyticsData.totalVolume / 7
-    return [
-      { name: 'Mon', volume: baseVolume * 0.8, trades: Math.floor(baseVolume * 0.8 / 1000) },
-      { name: 'Tue', volume: baseVolume * 1.2, trades: Math.floor(baseVolume * 1.2 / 1000) },
-      { name: 'Wed', volume: baseVolume * 0.6, trades: Math.floor(baseVolume * 0.6 / 1000) },
-      { name: 'Thu', volume: baseVolume * 1.4, trades: Math.floor(baseVolume * 1.4 / 1000) },
-      { name: 'Fri', volume: baseVolume * 1.1, trades: Math.floor(baseVolume * 1.1 / 1000) },
-      { name: 'Sat', volume: baseVolume * 0.7, trades: Math.floor(baseVolume * 0.7 / 1000) },
-      { name: 'Sun', volume: baseVolume * 0.9, trades: Math.floor(baseVolume * 0.9 / 1000) }
-    ]
+  // Generate real token volume data for bar chart
+  const generateTokenVolumeData = () => {
+    const tokenData = []
+    
+    // Use real prices from 1inch API to create bar chart data
+    Object.entries(prices).forEach(([address, priceData], index) => {
+      if (priceData && priceData.volume24h) {
+        const tokenSymbol = getTokenSymbol(address, selectedNetwork)
+        const colors = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EF4444']
+        
+        tokenData.push({
+          name: tokenSymbol,
+          volume: priceData.volume24h,
+          price: priceData.price,
+          priceChange: priceData.priceChange24h,
+          color: colors[index % colors.length]
+        })
+      }
+    })
+
+    // Sort by volume (highest first)
+    return tokenData.sort((a, b) => b.volume - a.volume)
   }
 
   const generateTokenData = () => {
@@ -304,21 +314,32 @@ export function AnalyticsDashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Volume Chart */}
+        {/* Token Volume Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Weekly Trading Volume</CardTitle>
+            <CardTitle>Daily Token Volume (24h)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={generateVolumeData()}>
+              <BarChart data={generateTokenVolumeData()}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`$${(Number(value) / 1000000).toFixed(1)}M`, 'Volume']} />
-                <Line type="monotone" dataKey="volume" stroke="#3B82F6" strokeWidth={2} />
-              </LineChart>
+                <Tooltip 
+                  formatter={(value, name, props) => [
+                    `$${(Number(value) / 1000000).toFixed(1)}M`, 
+                    'Volume'
+                  ]}
+                  labelFormatter={(label) => `${label} (24h Volume)`}
+                />
+                <Bar dataKey="volume" fill="#3B82F6" />
+              </BarChart>
             </ResponsiveContainer>
+            <div className="mt-4 text-sm text-gray-600">
+              <p>📊 Real 24h trading volume from 1inch API</p>
+              <p>🔄 Updates every 30 seconds</p>
+              <p>📈 Shows actual market activity per token</p>
+            </div>
           </CardContent>
         </Card>
 

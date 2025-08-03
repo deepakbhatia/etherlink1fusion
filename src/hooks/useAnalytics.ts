@@ -89,8 +89,7 @@ export function useAnalytics(selectedNetwork: string = 'etherlinkTestnet') {
       const activeOrders = factoryData ? (factoryData as any).length * 10 : 247
       const totalUsers = factoryData ? (factoryData as any).length * 5.8 : 1423
 
-      // Generate  volume data based on real prices
-      const volumeData = generateVolumeData(baseVolume)
+      // Generate token data based on real prices
       const tokenData = generateTokenData(realPrices)
       const recentTrades = generateRecentTrades()
 
@@ -107,7 +106,7 @@ export function useAnalytics(selectedNetwork: string = 'etherlinkTestnet') {
         activeOrders,
         totalUsers,
         avgFillTime: 2.3,
-        volumeData,
+        volumeData: [], // Removed - now using real token volume in AnalyticsDashboard
         tokenData,
         recentTrades,
         contractStatus,
@@ -122,23 +121,7 @@ export function useAnalytics(selectedNetwork: string = 'etherlinkTestnet') {
     }
   }
 
-  const generateVolumeData = (baseVolume: number) => {
-    const dailyVolumes = [
-      baseVolume * 0.8, // Mon
-      baseVolume * 1.2, // Tue
-      baseVolume * 0.6, // Wed
-      baseVolume * 1.4, // Thu
-      baseVolume * 1.1, // Fri
-      baseVolume * 0.7, // Sat
-      baseVolume * 0.9  // Sun
-    ]
-
-    return dailyVolumes.map((volume, index) => ({
-      name: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index],
-      volume,
-      trades: Math.floor(volume / 1000)
-    }))
-  }
+  // Note: generateVolumeData removed - now using real token volume data in AnalyticsDashboard
 
   const generateTokenData = (realPrices: any) => {
     // Use real prices to generate token distribution
